@@ -1,5 +1,6 @@
 package hackathon.bigone.sunsak.global.security;
 
+import hackathon.bigone.sunsak.accounts.user.service.LogoutService;
 import hackathon.bigone.sunsak.global.security.jwt.JwtAuthenticationFilter;
 import hackathon.bigone.sunsak.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private final LogoutService logoutService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,7 +40,8 @@ public class SecurityConfig {
                                 // mypage, 식품 보관함 목록 보기 -> 인증 필요
                 )
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider, logoutService),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -3,6 +3,7 @@ package hackathon.bigone.sunsak.global.security.jwt;
 import hackathon.bigone.sunsak.global.security.jwt.dto.JwtTokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -76,6 +77,25 @@ public class JwtTokenProvider {
                  UnsupportedJwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public long getRemainingExpiration(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey) // 시크릿 키
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration().getTime() - System.currentTimeMillis();
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);  // "Bearer " 이후의 실제 토큰만 잘라서 반환
+        }
+
+        return null;  // 없거나 형식 안 맞으면 null 반환
     }
 }
 
