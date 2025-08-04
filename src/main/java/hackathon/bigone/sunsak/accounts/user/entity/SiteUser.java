@@ -1,6 +1,6 @@
 package hackathon.bigone.sunsak.accounts.user.entity;
 
-import hackathon.bigone.sunsak.base.entity.BaseEntity;
+import hackathon.bigone.sunsak.base.entity.BaseTime;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,7 @@ import lombok.*;
 @Builder
 @Table(name="SiteUser")
 @AttributeOverride(name = "id", column = @Column(name = "user_id")) //id를 user_id로 바꿈
-public class SiteUser extends BaseEntity { //id 상속
+public class SiteUser extends BaseTime { //id 상속
     private String nickname;
 
     @Column(unique = true)
