@@ -20,14 +20,14 @@ public class SingupValidator {
     private void nicknameValidate(String nickname){
         String regex = "^[가-힣a-zA-Z\\s]{2,10}$";
         if (!nickname.matches(regex)) {
-            throw new IllegalArgumentException("공백포함 영문 또는 한글 2~10자");
+            throw new IllegalArgumentException("공백 포함 2~10자의 영문 또는 한글을 입력하세요.");
         }
     }
 
     private void usernameValidate(String username){
         String regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{5,12}$";
         if(!username.matches(regex)){
-            throw new IllegalArgumentException("영문, 숫자 포함 5~12자");
+            throw new IllegalArgumentException("영문, 숫자 포함 5~12자를 입력하세요.");
         }
 
         if(userRepository.existsByUsername(username)){
@@ -38,7 +38,7 @@ public class SingupValidator {
     private void passwordValidate(String password, String repeatPw){
         String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=`~{}\\[\\]:\";'<>?,./]).{8,16}$";
         if (!password.matches(regex)) {
-            throw new IllegalArgumentException("비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자여야 합니다.");
+            throw new IllegalArgumentException("비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자를 입력하세요.");
         }
 
         if (!password.equals(repeatPw)) {

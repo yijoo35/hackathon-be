@@ -1,7 +1,7 @@
 package hackathon.bigone.sunsak.accounts.user.controller;
 
 import hackathon.bigone.sunsak.accounts.user.dto.SignupRequestDto;
-import hackathon.bigone.sunsak.accounts.user.service.UserService;
+import hackathon.bigone.sunsak.accounts.user.service.SignupService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,14 +15,15 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final SignupService signupService;
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String,String>> signup(@RequestBody SignupRequestDto rqDto){
-        userService.create(rqDto);
+        signupService.create(rqDto);
 
         return ResponseEntity.ok(
                 Map.of("message", "회원가입이 완료되었습니다.")
         );
     }
+
 }
