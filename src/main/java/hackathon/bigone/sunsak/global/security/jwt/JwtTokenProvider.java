@@ -3,6 +3,7 @@ package hackathon.bigone.sunsak.global.security.jwt;
 import hackathon.bigone.sunsak.global.security.jwt.dto.JwtTokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -31,7 +32,8 @@ public class JwtTokenProvider {
 
     @PostConstruct
     protected void init() {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes()); //Key 초기화, Bean 생성 후 실행
+        byte[] decodedKey = Base64.getDecoder().decode(secretKey); // 👈 Base64 디코딩 추가
+        this.key = Keys.hmacShaKeyFor(decodedKey);
     }
 
     public JwtTokenDto createToken(String username) {
@@ -81,7 +83,7 @@ public class JwtTokenProvider {
 
     public long getRemainingExpiration(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(secretKey) // 시크릿 키
+                .setSigningKey(key) // 시크릿 키
                 .parseClaimsJws(token)
                 .getBody();
 

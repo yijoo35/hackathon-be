@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final LogoutService logoutService;
+    //private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,10 +40,10 @@ public class SecurityConfig {
                                 .anyRequest().permitAll() // 나머지는 일단 허용
                                 // mypage, 식품 보관함 목록 보기 -> 인증 필요
                 )
-
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenProvider, logoutService),
                         UsernamePasswordAuthenticationFilter.class)
+                //.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .build();
     }
 
