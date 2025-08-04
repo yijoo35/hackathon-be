@@ -5,7 +5,6 @@ import hackathon.bigone.sunsak.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,10 +32,10 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(
                         org.springframework.security.config.http.SessionCreationPolicy.STATELESS)) // 세션 사용 안함
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/**").authenticated() // POST는 인증 필요
-                        .requestMatchers("/user/login", "/user/signup").permitAll() // 로그인, 회원가입은 제외
-                        .anyRequest().permitAll() // 나머지는 일단 허용
-                        //mypage, 식품 보관함 목록 보기 -> 인증 필요
+                                .requestMatchers("/user/login", "/user/signup").permitAll() // 로그인, 회원가입은 제외
+                                // .requestMatchers(HttpMethod.POST, "/**").authenticated() // POST는 인증 필요
+                                .anyRequest().permitAll() // 나머지는 일단 허용
+                                // mypage, 식품 보관함 목록 보기 -> 인증 필요
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),

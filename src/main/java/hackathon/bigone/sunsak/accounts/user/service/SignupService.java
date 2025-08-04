@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class SignupService {
@@ -29,4 +31,7 @@ public class SignupService {
         return userRepository.save(user);
     }
 
+    public Optional<SiteUser> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }

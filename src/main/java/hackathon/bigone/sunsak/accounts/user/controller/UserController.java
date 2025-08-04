@@ -11,8 +11,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,8 @@ public class UserController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto rqDto){
@@ -44,17 +47,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto dto) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
-            );
+        SiteUser user = signupService.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("아이디와 비밀번호를 다시 확인하세요."));
 
-            JwtTokenDto token = jwtTokenProvider.createToken(dto.getUsername());
-            return ResponseEntity.ok(token);
-
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("아이디 또는 비밀번호를 다시 확인하세요.");
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("아이디와 비밀번호를 다시 확인하세요.");
         }
+
+        JwtTokenDto token = jwtTokenProvider.createToken(dto.getUsername());
+        return ResponseEntity.ok(token);
     }
 }
