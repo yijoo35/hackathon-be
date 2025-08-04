@@ -19,6 +19,7 @@ public class UserInit {
     @Order(4) //초기 데이터 실행 순서
     public ApplicationRunner initUsers(){
         return args -> {
+            //userRepository.deleteAll();
             if (userRepository.count() == 0) {
                 insertDefaultUsers();
             }
@@ -45,7 +46,7 @@ public class UserInit {
         System.out.println("초기 사용자 데이터 넣기 완료");
     }
 
-    private SiteUser createUser(String username, String rawPw, String nickname) {
-        return new SiteUser(username, passwordEncoder.encode(rawPw), nickname);
+    private SiteUser createUser(String nickname, String username, String rawPw) {
+        return new SiteUser(nickname, username, passwordEncoder.encode(rawPw));
     }
 }

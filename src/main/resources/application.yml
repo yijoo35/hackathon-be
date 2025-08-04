@@ -13,7 +13,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
@@ -22,3 +22,6 @@ spring:
 
 server:
   port: 8080 # default port
+
+jwt:
+  secret: Ke9hqr5rC2N9ehW4q8zenXHgmme1dmnpMJhB2rwxrB9XfLKpWIkNdwI6Fd2fwaqYG15I/yGtnjBaNtFEmyXpOg==
