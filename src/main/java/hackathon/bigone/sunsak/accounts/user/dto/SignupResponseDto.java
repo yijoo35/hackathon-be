@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserResponseDto { //응답
+public class SignupResponseDto { //응답
     @JsonProperty("user_id") //json에서 user_id로 보이게
     private Long id;
     private String nickname;

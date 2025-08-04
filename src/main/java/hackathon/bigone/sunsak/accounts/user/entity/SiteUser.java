@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="site_user")
+@Table(name="SiteUser")
 @AttributeOverride(name = "id", column = @Column(name = "user_id")) //id를 user_id로 바꿈
 public class SiteUser extends BaseEntity { //id 상속
     private String nickname;
