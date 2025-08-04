@@ -15,5 +15,5 @@ public class SignupResponseDto { //응답
 
     private String username; //중복 금지
 
-    private String password;
+    private String message; //확인 메시지
 }
