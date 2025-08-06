@@ -1,6 +1,6 @@
 package hackathon.bigone.sunsak.accounts.mypage;
 
-import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetails;
+import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,7 @@ public class MypageController {
                     Map.of("message", "로그인 하고 순삭의 다양한 서비스를 경험해보세요!")
             );
         }
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetail user = (CustomUserDetail) authentication.getPrincipal();
         return ResponseEntity.ok(Map.of(
                 "nickname", user.getNickname(),
                 "username", user.getUsername()

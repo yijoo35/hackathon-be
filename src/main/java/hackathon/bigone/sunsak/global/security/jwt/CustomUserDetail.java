@@ -12,7 +12,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetail implements UserDetails {
 
     private final SiteUser user;
 
