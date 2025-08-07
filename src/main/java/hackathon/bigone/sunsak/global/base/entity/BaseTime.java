@@ -1,4 +1,4 @@
-package hackathon.bigone.sunsak.base.entity;
+package hackathon.bigone.sunsak.global.base.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
