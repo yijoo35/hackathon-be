@@ -47,6 +47,9 @@ dependencies {
 	// RedisTemplate에서 문자열 직렬화에 필요
 	implementation 'org.springframework.data:spring-data-redis'
 	implementation 'org.apache.commons:commons-pool2'
+
+	// MySQL 연결용 드라이버
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 }
 
 tasks.named('test') {
