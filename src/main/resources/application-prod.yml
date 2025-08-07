@@ -12,3 +12,6 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: false
+        id:
+          new_generator_mappings: false  # 추가
+
