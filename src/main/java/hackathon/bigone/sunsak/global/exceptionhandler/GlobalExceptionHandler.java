@@ -12,14 +12,22 @@ import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
-    public ResponseEntity<Map<String, String>> handleAuthExceptions(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception e) {
+        HttpStatus status = mapStatus(e);
+        return ResponseEntity.status(status)
                 .body(Map.of("message", e.getMessage()));
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    private HttpStatus mapStatus(Exception e) {
+        if (e instanceof BadCredentialsException || e instanceof UsernameNotFoundException) {
+            return HttpStatus.UNAUTHORIZED; // 401
+        } else if (e instanceof NoSuchElementException) {
+            return HttpStatus.NOT_FOUND; // 404
+        } else if (e instanceof IllegalArgumentException) {
+            return HttpStatus.BAD_REQUEST; // 400
+        }
+        return HttpStatus.INTERNAL_SERVER_ERROR; // 기본값 500
     }
 }

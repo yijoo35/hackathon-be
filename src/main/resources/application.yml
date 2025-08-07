@@ -18,10 +18,16 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
+
   data: #redis 설정 추가
     redis:
       host: localhost
       port: 6379
+
+  config:
+    import: application-secret.yml
+  profiles: # 추가
+    active: prod
 
 server:
   port: 8080 # default port

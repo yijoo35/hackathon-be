@@ -1,0 +1,41 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop  # 배포 트리거 브랜치
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env: # 추가
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add EC2 host to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: SSH and run deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: | # 경로 오류로 수정
+            cd ~/sunsak  
+            git pull origin develop
+            chmod +x deploy.sh
+            ./deploy.sh
+      

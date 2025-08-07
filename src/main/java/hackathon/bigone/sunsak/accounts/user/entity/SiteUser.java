@@ -1,6 +1,6 @@
 package hackathon.bigone.sunsak.accounts.user.entity;
 
-import hackathon.bigone.sunsak.base.entity.BaseTime;
+import hackathon.bigone.sunsak.global.base.entity.BaseTime;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
