@@ -25,6 +25,8 @@ spring:
       host: localhost
       port: 6379
 
+  config:
+    import: application-secret.yml
   profiles: # 추가
     active: prod
 
