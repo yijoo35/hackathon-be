@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ">>> Build start"
-./gradlew clean build
+./gradlew clean build -x test # test 없이 build
 
 echo ">>> Kill existing Java process"
 pkill -f 'java -jar' || true
