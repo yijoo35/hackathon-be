@@ -23,11 +23,15 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
-            cd ~/sunsak-app &&
-            git pull origin main &&
-            chmod +x deploy.sh &&
+      - name: SSH and run deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ~/sunsak-app
+            git pull origin develop
+            chmod +x deploy.sh
             ./deploy.sh
-          '
+      
