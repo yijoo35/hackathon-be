@@ -2,10 +2,13 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev # 배포 시 prod로
+
   datasource:
-    url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak
     username: admin
-    password: sunsak2025!!
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -15,6 +18,12 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}

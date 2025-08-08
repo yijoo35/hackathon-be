@@ -1,4 +1,6 @@
-# application-dev.yml
+server:
+  port: 8080
+
 spring:
   datasource:
     driver-class-name: org.h2.Driver
@@ -18,10 +20,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
+        use_sql_comments: true
 
   data:
     redis:
       host: localhost
       port: 6379
       password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+
+naver:
+  ocr:
+    secret_key: ${OCR_SECRET_KEY}
+    invoke_url: ${OCR_API_INVOKE_URL}
