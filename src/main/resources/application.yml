@@ -1,12 +1,10 @@
-spring:
+spring: # rds 연결 안되는 문제로 수정
   config:
-    activate:
-      on-profile: default
     import: application-secret.yml
 
   profiles:
+    active: prod
     include: secret
-    active: dev  # 기본값은 dev (로컬 개발 기준)
 
 server:
   port: 8080
