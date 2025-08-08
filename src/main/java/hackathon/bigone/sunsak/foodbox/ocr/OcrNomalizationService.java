@@ -1,4 +1,4 @@
-package hackathon.bigone.sunsak.foodbox.ocr.service;
+package hackathon.bigone.sunsak.foodbox.ocr;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

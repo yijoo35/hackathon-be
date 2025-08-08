@@ -1,18 +1,21 @@
 package hackathon.bigone.sunsak.foodbox.nlp.service;
 
-import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
+import hackathon.bigone.sunsak.foodbox.ocr.OcrExtractedItem;
 import jakarta.annotation.PostConstruct;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
+import org.springframework.core.io.ClassPathResource;
 import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+// ... (나머지 임포트)
 
 @Service
 public class NlpService {
@@ -20,32 +23,28 @@ public class NlpService {
 
     @PostConstruct
     public void initKomoran() {
-        komoran = new Komoran(DEFAULT_MODEL.FULL);
         try {
-            // ClassPath에서 사전 파일 읽기
+            // JAR 파일 내부에 있는 사용자 사전을 임시 파일로 복사
             ClassPathResource resource = new ClassPathResource("data/user_dict.txt");
+            Path tempUserDict = Files.createTempFile("user_dict", ".txt");
 
-            // 임시 파일 생성 후 복사 (jar 내부 리소스는 File 객체로 접근 불가하기 때문)
-            File tempFile = File.createTempFile("user_dict", ".txt");
-            tempFile.deleteOnExit(); // JVM 종료 시 자동 삭제
-
-            try (InputStream in = resource.getInputStream();
-                 FileOutputStream out = new FileOutputStream(tempFile)) {
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, len);
-                }
+            try (InputStream inputStream = resource.getInputStream()) {
+                Files.copy(inputStream, tempUserDict, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // Komoran에 사용자 사전 경로 설정
-            komoran.setUserDic(tempFile.getAbsolutePath());
-            System.out.println("KOMORAN 사용자 사전 로드 완료: " + tempFile.getAbsolutePath());
+            // Komoran 초기화 시 임시 파일 경로 사용
+            komoran = new Komoran(DEFAULT_MODEL.FULL);
+            komoran.setUserDic(tempUserDict.toString());
+
+            System.out.println("KOMORAN 사용자 사전 로드 완료: " + tempUserDict.toString());
+
+            // 임시 파일 삭제
+            tempUserDict.toFile().deleteOnExit();
+
         } catch (Exception e) {
             throw new RuntimeException("사용자 사전 로딩 실패", e);
         }
     }
-
 
     public List<OcrExtractedItem> extractNouns(List<OcrExtractedItem> rawItems){
         List<OcrExtractedItem> result = new ArrayList<>();
@@ -56,8 +55,7 @@ public class NlpService {
             List<String> nouns = komoranResult.getNouns().stream()
                     .filter(noun -> noun.length()>=1)//>=2?
                     .toList();
-
-            for(String noun: nouns){ //명사, 수량
+            for(String noun: nouns){
                 result.add(new OcrExtractedItem(noun, item.getQuantity()));
                 System.out.println("["+noun+","+item.getQuantity()+"]");
             }

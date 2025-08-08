@@ -28,6 +28,7 @@ sourceSets { //리소스 설정
 	main {
 		resources {
 			srcDirs = ['src/main/resources']
+			includes = ["**"]
 		}
 	}
 }
@@ -69,4 +70,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+	exclude '**/SunsakApplicationTests.class'
 }

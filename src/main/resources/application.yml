@@ -26,7 +26,7 @@ spring:
       password: ${REDIS_PASSWORD}
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: Ke9hqr5rC2N9ehW4q8zenXHgmme1dmnpMJhB2rwxrB9XfLKpWIkNdwI6Fd2fwaqYG15I/yGtnjBaNtFEmyXpOg==;OCR_SECRET_KEY=d2dZTWlKTlhicWxkTm9xZlRzdW9saEViQk9NTXVmelg=;OCR_API_INVOKE_URL=https://52plvh6gid.apigw.ntruss.com/custom/v1/44775/82cef2d76b8cb0cf4cbdd55053bcc86dae2b61be6d5763f1b306f42f8062310d/document/receipt;MYSQL_USER=admin;MYSQL_PASSWORD=sunsak2025!!;REDIS_PASSWORD=sunsak2025
 
 naver:
   ocr:

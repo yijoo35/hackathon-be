@@ -1,4 +1,4 @@
-package hackathon.bigone.sunsak.foodbox.foodbox.dto;
+package hackathon.bigone.sunsak.foodbox.foodbox;
 
 import lombok.Builder;
 import lombok.Getter;

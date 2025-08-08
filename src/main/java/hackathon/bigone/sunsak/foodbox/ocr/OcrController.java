@@ -1,10 +1,7 @@
-package hackathon.bigone.sunsak.foodbox.ocr.controller;
+package hackathon.bigone.sunsak.foodbox.ocr;
 
-import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.FoodItemResponse;
 import hackathon.bigone.sunsak.foodbox.nlp.service.NlpService;
-import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
-import hackathon.bigone.sunsak.foodbox.ocr.service.OcrNomalizationService;
-import hackathon.bigone.sunsak.foodbox.ocr.service.OcrService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

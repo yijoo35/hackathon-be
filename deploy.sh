@@ -1,28 +1,20 @@
 #!/bin/bash
-set -euo pipefail
+
+echo ">>> Build start"
+./gradlew clean build -x test
 
 echo ">>> Kill existing Java process"
 pkill -f 'java -jar' || true
 
-# 환경변수 필수 체크
-required=(MYSQL_USER MYSQL_PASSWORD REDIS_PASSWORD JWT_SECRET OCR_SECRET_KEY OCR_API_INVOKE_URL)
-for k in "${required[@]}"; do
-  if [ -z "${!k:-}" ]; then
-    echo "ENV MISSING: $k"
-    exit 1
-  fi
-done
-
 echo ">>> Start new jar"
 JAR_NAME=$(ls build/libs/*SNAPSHOT.jar | grep -v plain | head -n 1)
 
-nohup java \
-  -Dspring.datasource.username="$MYSQL_USER" \
-  -Dspring.datasource.password="$MYSQL_PASSWORD" \
-  -Dspring.data.redis.password="$REDIS_PASSWORD" \
-  -Djwt.secret="$JWT_SECRET" \
-  -Docr.secret.key="$OCR_SECRET_KEY" \
-  -Docr.api.invoke.url="$OCR_API_INVOKE_URL" \
-  -jar "$JAR_NAME" > ../log.out 2>&1 &
+# 환경변수 확인(로그 찍기, 테스트용)
+echo "MYSQL_USER is $MYSQL_USER"
+echo "MYSQL_PASSWORD is $MYSQL_PASSWORD"
+echo "REDIS_PASSWORD is $REDIS_PASSWORD"
+echo "JWT_SECRET is $JWT_SECRET"
+echo "OCR_SECRET_KEY is $OCR_SECRET_KEY"
+echo "OCR_API_INVOKE_URL is $OCR_API_INVOKE_URL"
 
-echo "Launched PID=$!"
+nohup java -jar "$JAR_NAME" > ../log.out 2>&1 &

@@ -1,6 +1,5 @@
-package hackathon.bigone.sunsak.foodbox.foodbox.repository;
+package hackathon.bigone.sunsak.foodbox.foodbox;
 
-import hackathon.bigone.sunsak.foodbox.foodbox.entity.FoodBox;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

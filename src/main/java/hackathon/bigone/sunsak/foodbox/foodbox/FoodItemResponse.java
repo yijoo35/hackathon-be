@@ -1,11 +1,11 @@
-package hackathon.bigone.sunsak.foodbox.ocr.dto;
+package hackathon.bigone.sunsak.foodbox.foodbox;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class OcrExtractedItem {
+public class FoodItemResponse {
     private String name;
     private int quantity;
 }
