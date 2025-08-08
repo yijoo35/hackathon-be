@@ -1,7 +1,9 @@
 package hackathon.bigone.sunsak.foodbox.foodbox;
 
+import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +18,13 @@ public class FoodBoxController {
     private final FoodBoxService foodBoxService;
 
     @PostMapping("/save")
-    public ResponseEntity<List<FoodBoxResponse>> saveFoods(@RequestBody List<FoodItemResponse> items){
-        List<FoodBoxResponse> savedFoods = foodBoxService.saveSelectedFoods(items);
+    public ResponseEntity<List<FoodBoxResponse>> saveFoods(
+            @RequestBody List<FoodItemResponse> items,
+            @AuthenticationPrincipal CustomUserDetail userDetail
+    ) {
+        Long userId = userDetail.getId(); // JWT 인증 기반
+        List<FoodBoxResponse> savedFoods = foodBoxService.saveSelectedFoods(userId, items);
         return ResponseEntity.ok(savedFoods);
     }
+
 }

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) (선택) 호스트 키 자동 등록
+      # 1) 호스트 키 자동 등록
       - name: Add EC2 host to known_hosts
         run: |
           mkdir -p ~/.ssh
@@ -24,28 +24,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
 
-          # 원격 EC2 세션에만 필요한 환경변수
-          #          envs: |
-          #            MYSQL_USER=${{ secrets.MYSQL_USER }}
-          #            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-          #            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-          #            JWT_SECRET=${{ secrets.JWT_SECRET }}
-          #            OCR_SECRET_KEY=${{ secrets.OCR_SECRET_KEY }}
-          #            OCR_API_INVOKE_URL=${{ secrets.OCR_API_INVOKE_URL }}
+          # 긴 빌드 시간 대비
+          command_timeout: 300
 
-          # StrictHostKeyChecking 명시 해제 (옵션)
-          check_host_key: false
+          # 환경변수 전달 (더 안전하고 깔끔)
+          envs: |
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            OCR_SECRET_KEY=${{ secrets.OCR_SECRET_KEY }}
+            OCR_API_INVOKE_URL=${{ secrets.OCR_API_INVOKE_URL }}
 
           script: |
             cd ~/sunsak
             git pull origin develop
             chmod +x deploy.sh
-
-            export MYSQL_USER="${{ secrets.MYSQL_USER }}"
-            export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
-            export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
-            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
-            export OCR_SECRET_KEY="${{ secrets.OCR_SECRET_KEY }}"
-            export OCR_API_INVOKE_URL="${{ secrets.OCR_API_INVOKE_URL }}"
-
             ./deploy.sh

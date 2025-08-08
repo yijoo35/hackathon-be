@@ -16,41 +16,45 @@ public class FoodBoxService {
 
     private static final int DEFAULT_EXPIRY_DAYS = 0;
 
-    List<FoodBoxResponse> saved = new ArrayList<>();
+    public List<FoodBoxResponse> saveSelectedFoods(Long userId, List<FoodItemResponse> items) {
+        List<FoodBoxResponse> saved = new ArrayList<>();
 
-    public List<FoodBoxResponse> saveSelectedFoods(List<FoodItemResponse> items) {
         for (FoodItemResponse item : items) {
             String name = item.getName();
             int quantity = item.getQuantity();
 
+            // Redis에서 유통기한 정보 가져오기
             String expiryStr = redisTemplate.opsForValue().get("expiry:" + name);
             int expiryDays = parseExpiry(expiryStr);
             LocalDate expiryDate = LocalDate.now().plusDays(expiryDays);
 
-            FoodBox food = FoodBox.builder()
-                    .name(name)
-                    .quantity(quantity)
-                    .expiryDate(expiryDate)
-                    .build();
+            // 엔티티 저장
+            FoodBox food = foodBoxRepository.save(
+                    FoodBox.builder()
+                            .userId(userId) // 👈 사용자 식별
+                            .name(name)
+                            .quantity(quantity)
+                            .expiryDate(expiryDate)
+                            .build()
+            );
 
+            // 저장된 엔티티의 PK 포함한 응답 생성
             saved.add(FoodBoxResponse.builder()
+                    .foodId(food.getId()) // 👈 PK
                     .name(food.getName())
                     .quantity(food.getQuantity())
                     .expiryDate(food.getExpiryDate())
                     .build());
-
-            foodBoxRepository.save(food);
         }
+
         return saved;
     }
 
     private int parseExpiry(String expiryStr) {
-        try{
+        try {
             return expiryStr != null ? Integer.parseInt(expiryStr) : DEFAULT_EXPIRY_DAYS;
-        }
-        catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return DEFAULT_EXPIRY_DAYS;
         }
     }
-
 }

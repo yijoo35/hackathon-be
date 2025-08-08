@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class FoodBox extends BaseEntity {
+    private Long userId;
     private String name;
     private int quantity;
     private LocalDate expiryDate;
