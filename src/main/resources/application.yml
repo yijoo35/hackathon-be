@@ -1,12 +1,32 @@
-spring:
-  profiles:
-    active: prod
-
 server:
   port: 8080
 
+spring:
+  profiles:
+    active: dev # 배포 시 prod로
+
+  datasource:
+    url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak
+    username: admin
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD}
+
 jwt:
-  secret: ${JWT_SECRET}
+  secret: Ke9hqr5rC2N9ehW4q8zenXHgmme1dmnpMJhB2rwxrB9XfLKpWIkNdwI6Fd2fwaqYG15I/yGtnjBaNtFEmyXpOg==;OCR_SECRET_KEY=d2dZTWlKTlhicWxkTm9xZlRzdW9saEViQk9NTXVmelg=;OCR_API_INVOKE_URL=https://52plvh6gid.apigw.ntruss.com/custom/v1/44775/82cef2d76b8cb0cf4cbdd55053bcc86dae2b61be6d5763f1b306f42f8062310d/document/receipt;MYSQL_USER=admin;MYSQL_PASSWORD=sunsak2025!!;REDIS_PASSWORD=sunsak2025
 
 naver:
   ocr:
