@@ -1,5 +1,7 @@
-#배포 시 사용
 spring:
+  profiles:
+    include: secret
+
   datasource:
     url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak
     username: ${MYSQL_USER}
