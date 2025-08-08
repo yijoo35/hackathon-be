@@ -1,0 +1,20 @@
+package hackathon.bigone.sunsak.foodbox.foodbox;
+
+import hackathon.bigone.sunsak.global.base.entity.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Entity
+@Table(name="food_box")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+public class FoodBox extends BaseEntity {
+    private String name;
+    private int quantity;
+    private LocalDate expiryDate;
+}

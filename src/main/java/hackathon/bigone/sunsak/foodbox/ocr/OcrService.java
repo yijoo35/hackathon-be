@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OcrApiClient { //OCR 호출
+public class OcrService { //OCR 호출
     @Value("${naver.ocr.invoke-url}")
     private String apiUrl;
 
