@@ -1,10 +1,8 @@
-spring: # rds 연결 안되는 문제로 수정
+spring:
   config:
-    import: application-secret.yml
-
+    import: optional:classpath:application-secret.yml
   profiles:
     active: prod
-    include: secret
 
 server:
   port: 8080
