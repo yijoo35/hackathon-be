@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: optional:classpath:application-secret.yml
   profiles:
     active: prod
 
