@@ -29,7 +29,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          check_host_key: false
           script_stop: true
           # 변수 "이름만" 나열 (값 아님)
           envs: MYSQL_USER,MYSQL_PASSWORD,REDIS_PASSWORD,JWT_SECRET,OCR_SECRET_KEY,OCR_API_INVOKE_URL
