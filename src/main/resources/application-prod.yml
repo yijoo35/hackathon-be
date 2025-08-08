@@ -11,6 +11,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        use_sql_comments: false
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
 
+  data:
+    redis:
+      host: localhost # EC2 내부에서 Redis 도는 경우
+      port: 6379
+      password: ${REDIS_PASSWORD}
