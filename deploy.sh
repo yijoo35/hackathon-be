@@ -19,8 +19,14 @@ done
 echo ">>> Start new jar"
 JAR_NAME=$(ls build/libs/*SNAPSHOT.jar | grep -v plain | head -n 1)
 
-# 디버그 (마스킹 없이 서버 로그에 남으니, 문제 해결 후엔 지워도 됨)
-env | grep -E 'MYSQL|REDIS|JWT|OCR' || true
+# **수정된 부분: `nohup` 명령어에 `-D` 옵션으로 환경 변수 직접 전달**
+nohup java \
+  -Dspring.datasource.username="$MYSQL_USER" \
+  -Dspring.datasource.password="$MYSQL_PASSWORD" \
+  -Dspring.data.redis.password="$REDIS_PASSWORD" \
+  -Djwt.secret="$JWT_SECRET" \
+  -Docr.secret.key="$OCR_SECRET_KEY" \
+  -Docr.api.invoke.url="$OCR_API_INVOKE_URL" \
+  -jar "$JAR_NAME" > ../log.out 2>&1 &
 
-nohup java -jar "$JAR_NAME" > ../log.out 2>&1 &
 echo "Launched PID=$!"
