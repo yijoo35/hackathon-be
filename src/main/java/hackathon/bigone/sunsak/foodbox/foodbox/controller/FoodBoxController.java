@@ -1,5 +1,8 @@
-package hackathon.bigone.sunsak.foodbox.foodbox;
+package hackathon.bigone.sunsak.foodbox.foodbox.controller;
 
+import hackathon.bigone.sunsak.foodbox.foodbox.service.FoodBoxService;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

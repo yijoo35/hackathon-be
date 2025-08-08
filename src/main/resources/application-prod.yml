@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://sunsak-db-1.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com/sunsak
+    username: admin
+    password: sunsak2025!!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
   data:

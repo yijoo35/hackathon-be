@@ -1,9 +1,20 @@
-spring:
-  profiles:
-    active: prod
-
 server:
   port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://sunsak-db.cva48mgg09q4.ap-northeast-2.rds.amazonaws.com:3306/sunsak
+    username: admin
+    password: sunsak2025!!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
 
 jwt:
   secret: ${JWT_SECRET}
@@ -12,4 +23,3 @@ naver:
   ocr:
     secret_key: ${OCR_SECRET_KEY}
     invoke_url: ${OCR_API_INVOKE_URL}
-

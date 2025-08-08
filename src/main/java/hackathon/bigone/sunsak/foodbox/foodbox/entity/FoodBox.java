@@ -1,4 +1,4 @@
-package hackathon.bigone.sunsak.foodbox.foodbox;
+package hackathon.bigone.sunsak.foodbox.foodbox.entity;
 
 import hackathon.bigone.sunsak.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
