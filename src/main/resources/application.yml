@@ -12,3 +12,4 @@ naver:
   ocr:
     secret_key: ${OCR_SECRET_KEY}
     invoke_url: ${OCR_API_INVOKE_URL}
+
