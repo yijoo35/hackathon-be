@@ -16,6 +16,10 @@ public class CustomUserDetail implements UserDetails {
 
     private final SiteUser user;
 
+    public Long getId() {
+        return user.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 권한이 여러 개일 경우 리스트로 변환
