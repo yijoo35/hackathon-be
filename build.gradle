@@ -24,7 +24,7 @@ repositories {
 	maven { url 'https://jitpack.io' } //Komoran
 }
 
-sourceSets { //리소스 설정
+sourceSets {
 	main {
 		resources {
 			srcDirs = ['src/main/resources']
@@ -33,6 +33,14 @@ sourceSets { //리소스 설정
 	}
 }
 
+tasks.named('processResources') {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	from('src/main/resources') {
+		include '**/*.txt'
+		include '**/*.csv'
+	}
+}
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
