@@ -1,5 +1,6 @@
-package hackathon.bigone.sunsak.foodbox.ocr;
+package hackathon.bigone.sunsak.foodbox.ocr.service;
 
+import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;

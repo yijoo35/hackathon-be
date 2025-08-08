@@ -1,5 +1,9 @@
-package hackathon.bigone.sunsak.foodbox.foodbox;
+package hackathon.bigone.sunsak.foodbox.foodbox.service;
 
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.entity.FoodBox;
+import hackathon.bigone.sunsak.foodbox.foodbox.repository.FoodBoxRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
