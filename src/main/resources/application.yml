@@ -24,10 +24,12 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: ${REDIS_PASSWORD}
 
   config:
     import: application-secret.yml
   profiles: # 추가
+    include: secret
     active: prod
 
 server:
@@ -35,3 +37,8 @@ server:
 
 jwt: #jwt key
   secret: Ke9hqr5rC2N9ehW4q8zenXHgmme1dmnpMJhB2rwxrB9XfLKpWIkNdwI6Fd2fwaqYG15I/yGtnjBaNtFEmyXpOg==
+
+naver:
+  ocr:
+    secret_key: ${OCR_SECRET_KEY}
+    invoke_url: ${OCR_API_INVOKE_URL}

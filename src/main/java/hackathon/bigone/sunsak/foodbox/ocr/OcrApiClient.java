@@ -1,5 +1,9 @@
 package hackathon.bigone.sunsak.foodbox.ocr;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-public class OcrApiClient {
+@Service
+@RequiredArgsConstructor
+public class OcrApiClient { //OCR 호출
 }

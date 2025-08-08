@@ -50,6 +50,9 @@ dependencies {
 
 	// MySQL 연결용 드라이버
 	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+
+	implementation 'com.github.shin285:KOMORAN:3.3.9' //Komoran
+
 }
 
 tasks.named('test') {
