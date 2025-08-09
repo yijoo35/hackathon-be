@@ -2,8 +2,8 @@ package hackathon.bigone.sunsak.foodbox.foodbox.controller;
 
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemRequest;
-import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
 import hackathon.bigone.sunsak.foodbox.foodbox.service.FoodBoxService;
+import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
 import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,14 +21,14 @@ public class FoodBoxController {
 
     @PostMapping("/ocr/save") //영수증 인식 입력
     public ResponseEntity<List<FoodBoxResponse>> saveFoodsWithOCR(
-            @RequestBody List<FoodItemResponse> items,
+            @RequestBody List<OcrExtractedItem> items,
             @AuthenticationPrincipal CustomUserDetail userDetail
     ) {
         if (userDetail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Long userId = userDetail.getId(); // JWT 인증 기반
-        List<FoodBoxResponse> savedFoods = foodBoxService.saveSelectedFoods(userId, items);
+        List<FoodBoxResponse> savedFoods = foodBoxService.saveFromOcr(userId, items);
         return ResponseEntity.ok(savedFoods);
     }
 
