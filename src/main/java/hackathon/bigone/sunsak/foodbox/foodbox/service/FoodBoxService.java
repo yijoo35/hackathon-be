@@ -190,14 +190,21 @@ public class FoodBoxService {
         foodBoxRepository.saveAll(entities);
     }
 
-//    private FoodBoxResponse toResponse(FoodBox e) {
-//        return FoodBoxResponse.builder()
-//                .foodId(e.getId())
-//                .name(e.getName())
-//                .quantity(e.getQuantity())
-//                .expiryDate(e.getExpiryDate())
-//                .build();
-//    }
 
+    public boolean delete(Long userId, List<Long> foodIds) {
+        if(foodIds == null || foodIds.isEmpty()) return false;
+
+        List<FoodBox> deleteFood = foodBoxRepository.findAllByIdIn(foodIds)
+                .stream()
+                .filter(f-> f.getUserId().equals(userId))
+                .toList();
+
+        if (deleteFood.isEmpty()) {
+            return false;
+        }
+
+        foodBoxRepository.deleteAll(deleteFood);
+        return true;
+    }
 }
 

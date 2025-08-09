@@ -80,4 +80,22 @@ public class FoodBoxController {
         foodBoxService.batchUpdate(userId, req.getItems());
         return ResponseEntity.ok(foodBoxService.getFoodsByUser(userId));
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteFoods(
+            @PathVariable List<Long> foodIds, //근데 id 여러개 삭제도 가능하게 할건데 List<Long> foodId 해야하나
+            @AuthenticationPrincipal CustomUserDetail userDetail
+    ){
+        if (userDetail == null || userDetail.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long userId = userDetail.getUser().getId();
+
+        if(foodBoxService.delete(userId, foodIds)){
+            return ResponseEntity.noContent().build();
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
