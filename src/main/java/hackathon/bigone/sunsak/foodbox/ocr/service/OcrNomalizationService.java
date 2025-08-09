@@ -59,12 +59,13 @@ public class OcrNomalizationService {
         // 최종 결과: 우선순위 적용, 없으면 자기 자신
         Map<String, String> result = new LinkedHashMap<>();
         for (String noun : distinct) {
-            if (breedSet.contains(noun)) {
-                result.put(noun, noun);
-            } else if (itemSet.contains(noun)) {
-                result.put(noun, noun);
-            } else {
-                result.put(noun, noun); // 폴백: 원문
+            String v = valueByNoun.get(noun);
+            if (v == null) continue; // 매핑 안 된 경우 → 저장 안 함
+
+            if (v.startsWith(TYPE_BREED)) {
+                result.put(noun, v.substring(TYPE_BREED.length())); // 품종명 값만
+            } else if (v.startsWith(TYPE_ITEM)) {
+                result.put(noun, v.substring(TYPE_ITEM.length())); // 대표식품명 값만
             }
         }
         log.debug("bulkNormalizeFromOcr result: {}", result);

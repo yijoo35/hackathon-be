@@ -35,4 +35,6 @@ public interface FoodBoxRepository extends JpaRepository<FoodBox, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "5000"))
     Optional<FoodBox> findByUserIdAndNameAndExpiryDate(Long userId, String name, LocalDate expiryDate);
+
+
 }
