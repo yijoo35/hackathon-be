@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - name: Check out code
+        # 1) 소스 체크아웃
         uses: actions/checkout@v4
 
       - name: Setup JDK 21
@@ -35,7 +36,7 @@ jobs:
       - name: List build outputs
         run: ls -alh build/libs
 
-      # 업로드할 산출물 경로를 하나로 확정(plain 제외)
+      # 2) 업로드할 산출물 하나 선택 (plain 제외)
       - name: Resolve artifact
         id: artifact
         shell: bash
@@ -45,10 +46,9 @@ jobs:
           test -n "$ART"
           echo "path=$ART" >> "$GITHUB_OUTPUT"
           echo "file=$(basename "$ART")" >> "$GITHUB_OUTPUT"
-          echo "Selected artifact: $ART"
-          sha256sum "$ART" || true
+          echo "Selected: $ART"
 
-      # 원격 폴더 준비 + 이전에 잘못 생긴 중첩 디렉토리 정리
+      # 3) 원격 폴더 준비 + 과거 잔여물 제거
       - name: Prepare remote dir
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -58,10 +58,11 @@ jobs:
           script: |
             set -euxo pipefail
             mkdir -p /home/ubuntu/sunsak/build/libs
-            # 중첩된 잔여물 정리(있으면)
-            rm -rf /home/ubuntu/sunsak/build/libs/build || true
+            # 과거에 잘못 생긴 디렉터리 정리
+            [ -d /home/ubuntu/sunsak/build/libs/release.jar ] && rm -rf /home/ubuntu/sunsak/build/libs/release.jar || true
+            [ -d /home/ubuntu/sunsak/build/libs/build ] && rm -rf /home/ubuntu/sunsak/build/libs/build || true
 
-      # 산출물 "하나"만 업로드 (경로 보존 X)
+      # 4) 산출물 업로드 (항상 '디렉터리'를 타깃으로!)
       - name: Copy jar to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -69,11 +70,11 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "${{ steps.artifact.outputs.path }}"
-          target: "/home/ubuntu/sunsak/build/libs/release.jar"
+          target: "/home/ubuntu/sunsak/build/libs/"
           overwrite: true
 
-      # release.jar -> app.jar 링크 갱신 후 systemd 재시작
-      - name: Symlink latest jar & restart via systemd
+      # 5) 업로드된 파일을 app.jar로 교체 → 재시작
+      - name: Replace app.jar & restart
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -83,14 +84,17 @@ jobs:
             set -euxo pipefail
             cd /home/ubuntu/sunsak/build/libs
 
-            echo ">>> After SCP:"
+            echo ">>> After SCP"
             ls -alh
 
-            test -f release.jar || { echo "release.jar not found"; exit 1; }
+            # 업로드된 파일명 (로컬 basename과 동일)
+            UP="${{ steps.artifact.outputs.file }}"
+            test -f "$UP"
 
-            # app.jar를 release.jar로 고정 링크
-            ln -sfn release.jar app.jar
+            # app.jar 교체
+            mv -f "$UP" app.jar
 
+            # 유닛 리로드 & 재시작 & 로그 출력
             sudo systemctl daemon-reload
             sudo systemctl restart sunsak
             sudo systemctl --no-pager --full status sunsak || true

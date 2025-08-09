@@ -1,8 +1,8 @@
 package hackathon.bigone.sunsak.foodbox.foodbox.controller;
 
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
-import hackathon.bigone.sunsak.foodbox.foodbox.service.FoodBoxService;
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.service.FoodBoxService;
 import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
