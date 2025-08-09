@@ -2,6 +2,7 @@ package hackathon.bigone.sunsak.foodbox.foodbox.controller;
 
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemRequest;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.update.FoodItemBatchUpdateRequest;
 import hackathon.bigone.sunsak.foodbox.foodbox.service.FoodBoxService;
 import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
 import hackathon.bigone.sunsak.global.security.jwt.CustomUserDetail;
@@ -68,5 +69,15 @@ public class FoodBoxController {
         return ResponseEntity.ok(list);
     }
 
-
+    @PatchMapping //품목을 미리 보여준 후, 바뀐 부분만 저장.
+    public ResponseEntity<List<FoodBoxResponse>> modifyFoods(
+            //@RequestParam(defaultValue = "false") boolean dryRun, //미리보기
+            @RequestBody FoodItemBatchUpdateRequest req,
+            @AuthenticationPrincipal CustomUserDetail userDetail
+    ){
+        if (userDetail == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Long userId = userDetail.getUser().getId();
+        foodBoxService.batchUpdate(userId, req.getItems());
+        return ResponseEntity.ok(foodBoxService.getFoodsByUser(userId));
+    }
 }
