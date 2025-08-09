@@ -1,4 +1,4 @@
-package hackathon.bigone.sunsak.foodbox.foodbox;
+package hackathon.bigone.sunsak.foodbox.foodbox.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;

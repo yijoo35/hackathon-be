@@ -1,6 +1,6 @@
 package hackathon.bigone.sunsak.foodbox.ocr;
 
-import hackathon.bigone.sunsak.foodbox.foodbox.FoodItemResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
 import hackathon.bigone.sunsak.foodbox.nlp.service.NlpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,5 +1,9 @@
-package hackathon.bigone.sunsak.foodbox.foodbox;
+package hackathon.bigone.sunsak.foodbox.foodbox.service;
 
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.entity.FoodBox;
+import hackathon.bigone.sunsak.foodbox.foodbox.repository.FoodBoxRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,7 +35,7 @@ public class FoodBoxService {
             // 엔티티 저장
             FoodBox food = foodBoxRepository.save(
                     FoodBox.builder()
-                            .userId(userId) // 👈 사용자 식별
+                            .userId(userId) // 사용자 식별
                             .name(name)
                             .quantity(quantity)
                             .expiryDate(expiryDate)
@@ -40,7 +44,7 @@ public class FoodBoxService {
 
             // 저장된 엔티티의 PK 포함한 응답 생성
             saved.add(FoodBoxResponse.builder()
-                    .foodId(food.getId()) // 👈 PK
+                    .foodId(food.getId()) // PK
                     .name(food.getName())
                     .quantity(food.getQuantity())
                     .expiryDate(food.getExpiryDate())
