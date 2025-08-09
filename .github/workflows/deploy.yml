@@ -4,9 +4,17 @@ on:
   push:
     branches: [develop]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-develop
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Check out code
@@ -23,16 +31,23 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build (skip tests)
-        run: ./gradlew build -x test
+        run: ./gradlew build -x test --console=plain
 
       - name: List build outputs
         run: ls -alh build/libs
 
-      - name: Add EC2 host to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      # 원격 경로 사전 생성 (절대경로 사용)
+      - name: Prepare remote dir
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -euxo pipefail
+            mkdir -p /home/ubuntu/sunsak/build/libs
 
+      # JAR 업로드 (절대경로)
       - name: Copy jar to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -40,9 +55,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "build/libs/*.jar"
-          target: "~/sunsak/build/libs/"
+          target: "/home/ubuntu/sunsak/build/libs/"
           overwrite: true
 
+      # 최신 JAR로 app.jar 갱신 후 systemd 재시작
       - name: Symlink latest jar & restart via systemd
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -51,19 +67,23 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -euxo pipefail
-            cd ~/sunsak/build/libs
+            cd /home/ubuntu/sunsak/build/libs
 
-            # 최신 "실제 파일" JAR 선택 (app.jar 심볼릭 링크 제외)
-            LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" \
+            echo ">>> After SCP:"
+            ls -alh
+
+            # 부트 실행 JAR 우선(plain 제외), 없으면 모든 JAR에서 최신 선택
+            LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" ! -name "*-plain.jar" -printf "%T@ %p\n" \
               | sort -nr | head -n1 | awk '{print $2}')
-
             if [ -z "${LATEST}" ]; then
-              echo "No candidate JAR found (except app.jar)"; exit 1
+              LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" \
+                | sort -nr | head -n1 | awk '{print $2}')
             fi
+            test -n "${LATEST}" || { echo "No JAR found"; exit 1; }
 
-            # 심볼릭 링크 갱신 (같은 타겟이어도 안전)
             ln -sfn "${LATEST}" app.jar
 
-            # 서비스 재시작 & 상태 확인
+            sudo systemctl daemon-reload
             sudo systemctl restart sunsak
             sudo systemctl --no-pager --full status sunsak || true
+            journalctl -u sunsak -n 100 --no-pager || true
