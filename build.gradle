@@ -17,6 +17,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	developmentOnly
 }
 
 repositories {
@@ -35,7 +36,6 @@ sourceSets {
 
 tasks.named('processResources') {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
 	from('src/main/resources') {
 		include '**/*.txt'
 		include '**/*.csv'
@@ -47,10 +47,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
+
+	//runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// (dev 전용) H2 — 운영엔 절대 포함 X
+	developmentOnly 'com.h2database:h2'
 
 	//security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -64,11 +68,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	// RedisTemplate에서 문자열 직렬화에 필요
-	implementation 'org.springframework.data:spring-data-redis'
 	implementation 'org.apache.commons:commons-pool2'
 
 	// MySQL 연결용 드라이버
-	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	implementation 'com.github.shin285:KOMORAN:3.3.9' //Komoran4
 
@@ -78,8 +81,5 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-test {
 	exclude '**/SunsakApplicationTests.class'
 }

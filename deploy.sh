@@ -3,7 +3,7 @@ set -euxo pipefail
 
 echo ">>> Build start"
 cd ~/sunsak
-./gradlew clean build -x test
+./gradlew build -x test --console=plain
 
 echo ">>> Kill existing Java process"
 pkill -f 'java -jar' || true
