@@ -36,32 +36,48 @@ public class FoodBoxService {
         if (clean.isEmpty()) return Collections.emptyList();
 
         // Redis에서 유통기한 일수 일괄 조회
-        List<String> names = clean.stream().map(FoodItemResponse::getName).toList();
-        List<String> keys  = names.stream().map(n -> EXPIRY_PREFIX + n).toList();
-        List<String> vals  = redisTemplate.opsForValue().multiGet(keys);
-        LocalDate today = LocalDate.now();
+        List<String> distinctNames = clean.stream().map(FoodItemResponse::getName).distinct().toList();
+        List<String> keys = distinctNames.stream().map(n -> EXPIRY_PREFIX + n).toList();
+        List<String> vals = redisTemplate.opsForValue().multiGet(keys);
 
-        // 엔티티 생성
-        List<FoodBox> toSave = new ArrayList<>(clean.size());
-        for (int i = 0; i < clean.size(); i++) {
-            FoodItemResponse it = clean.get(i);
-            String raw = (vals == null || i >= vals.size()) ? null : vals.get(i);
-            int days = parseExpiryDays(raw);
-            LocalDate expiry = (days <= 0) ? null : today.plusDays(days);
-
-            toSave.add(FoodBox.builder()
-                    .userId(userId)
-                    .name(it.getName())
-                    .quantity(it.getQuantity())
-                    .expiryDate(expiry)
-                    .build());
+        Map<String, Integer> daysByName = new HashMap<>();
+        for (int i = 0; i < distinctNames.size(); i++) {
+            String raw = (vals != null && i < vals.size()) ? vals.get(i) : null;
+            daysByName.put(distinctNames.get(i), parseExpiryDays(raw));
         }
 
-        // 저장
-        List<FoodBox> saved = foodBoxRepository.saveAll(toSave);
+        LocalDate today = LocalDate.now();
 
-        // 응답: 유통기한 오름차순 null은 마지막
-        Comparator<LocalDate> dateCmp = Comparator.nullsLast(Comparator.naturalOrder());
+        //name - exprity 기준으로 수량 합치기 (같은이름 수량 합치기)
+        record Key(String name, LocalDate expiry) {}
+        Map<Key, Integer> merged = new HashMap<>();
+        for (FoodItemResponse it : clean) {
+            String name = it.getName();
+            int qty = it.getQuantity();
+
+            int days = daysByName.getOrDefault(name, DEFAULT_EXPIRY_DAYS);
+            LocalDate expiry = (days <= 0) ? null : today.plusDays(days);
+
+            merged.merge(new Key(name, expiry), qty, Integer::sum);
+        }
+
+
+        for (var e : merged.entrySet()) {
+            Key k = e.getKey();
+            int qty = e.getValue();
+
+            var existing = foodBoxRepository.findByUserIdAndNameAndExpiryDate(userId, k.name(), k.expiry());
+            if (existing.isPresent()) {
+                existing.get().setQuantity(existing.get().getQuantity() + qty); // 같은이름 ,날짜
+            } else {
+                foodBoxRepository.save(FoodBox.builder()
+                        .userId(userId)
+                        .name(k.name())
+                        .quantity(qty)
+                        .expiryDate(k.expiry())
+                        .build());
+            }
+        }
 
         return foodBoxRepository.findAllSortedByUserId(userId).stream()
                 .map(f -> FoodBoxResponse.builder()
