@@ -83,3 +83,8 @@ tasks.named('test') {
 	useJUnitPlatform()
 	exclude '**/SunsakApplicationTests.class'
 }
+
+tasks.named('jar') { enabled = false }   // plain jar 비활성화
+bootJar {
+	archiveFileName = 'app.jar'         // 빌드 산출물명을 고정
+}
