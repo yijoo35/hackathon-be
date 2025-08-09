@@ -69,7 +69,7 @@ public class FoodBoxController {
         return ResponseEntity.ok(list);
     }
 
-    @PatchMapping //품목을 미리 보여준 후, 바뀐 부분만 저장.
+    @PatchMapping("/update") //수정
     public ResponseEntity<List<FoodBoxResponse>> modifyFoods(
             //@RequestParam(defaultValue = "false") boolean dryRun, //미리보기
             @RequestBody FoodItemBatchUpdateRequest req,
