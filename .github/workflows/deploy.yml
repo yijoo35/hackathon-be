@@ -51,11 +51,19 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -euxo pipefail
-            cd ~/sunsak
-            mkdir -p build/libs
-            # 최신 JAR를 app.jar로 심볼릭 링크
-            LATEST=$(ls -t build/libs/*.jar | head -n 1)
-            ln -sf "$LATEST" build/libs/app.jar
+            cd ~/sunsak/build/libs
+
+            # 최신 "실제 파일" JAR 선택 (app.jar 심볼릭 링크 제외)
+            LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" \
+              | sort -nr | head -n1 | awk '{print $2}')
+
+            if [ -z "${LATEST}" ]; then
+              echo "No candidate JAR found (except app.jar)"; exit 1
+            fi
+
+            # 심볼릭 링크 갱신 (같은 타겟이어도 안전)
+            ln -sfn "${LATEST}" app.jar
+
             # 서비스 재시작 & 상태 확인
             sudo systemctl restart sunsak
             sudo systemctl --no-pager --full status sunsak || true
