@@ -70,7 +70,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "${{ steps.artifact.outputs.path }}"
-          target: "/home/ubuntu/sunsak/build/libs/app.jar" # 업로드 시 파일명 지정
+          target: "/home/ubuntu/sunsak/build/libs/"  # 업로드 시 파일명 지정
+          strip_components: 2
           overwrite: true
 
       # 5) 업로드된 파일을 app.jar로 교체 → 재시작
