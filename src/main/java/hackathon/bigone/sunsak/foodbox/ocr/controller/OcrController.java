@@ -29,29 +29,41 @@ public class OcrController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<FoodItemResponse>> sendReceiptOcr(@RequestParam("file") MultipartFile file) throws Exception {
-        // OCR → 기본
+        // OCR 호출
         List<OcrExtractedItem> rawItems = ocrService.extractItemNamesFromImage(file);
-
-        // 명사만 추출
-        List<OcrExtractedItem> nouns = nlpService.extractNouns(rawItems);
-
-        // bulk 정규화
-        List<String> tokens = nouns.stream().map(OcrExtractedItem::getName).toList();
-        Map<String, String> normalizedMap = ocrNomalizationService.bulkNormalizeFromOcr(tokens);
-
-        // 최종명으로 수량 합산
-        Map<String, Integer> aggregated = new LinkedHashMap<>();
-        for (OcrExtractedItem item : nouns) {
-            String original = item.getName();
-            String finalName = normalizedMap.getOrDefault(original, original); // 폴백: 원문
-            aggregated.merge(finalName, item.getQuantity(), Integer::sum);
+        if (rawItems == null || rawItems.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
         }
 
-        // 응답 반환
+        // Komoran 분석 → user_dict 그룹 / 자유명사 그룹 분리
+        NlpService.ClassifiedTokens classified = nlpService.classifyByUserDict(rawItems);
+        Map<String, Integer> userDictGroup = classified.getUserDict();   // user_dict로 잡힌 토큰 (그대로 사용)
+        Map<String, Integer> freeNounGroup = classified.getFreeNouns();  // user_dict에 없는 명사
+
+        // 자유명사만 Redis keyword 매핑
+        Map<String, String> mappedFree = ocrNomalizationService.normalizeFreeNouns(freeNounGroup.keySet());
+
+        // 최종명 기준 수량 합산
+        Map<String, Integer> aggregated = new LinkedHashMap<>();
+
+        // user_dict 그룹: 표준명 = 그대로
+        for (var e : userDictGroup.entrySet()) {
+            aggregated.merge(e.getKey().trim(), Math.max(1, e.getValue()), Integer::sum);
+        }
+
+        // 3-2) 자유명사 그룹: keyword 매핑 성공한 것만 사용
+        for (var e : freeNounGroup.entrySet()) {
+            String mapped = mappedFree.get(e.getKey());
+            if (mapped == null || mapped.isBlank()) continue; // 매핑 실패 → 버림
+            aggregated.merge(mapped.trim(), Math.max(1, e.getValue()), Integer::sum);
+        }
+
+        // 4) 응답 변환
         List<FoodItemResponse> result = aggregated.entrySet().stream()
                 .map(e -> new FoodItemResponse(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
 
+        log.debug("OCR upload result: {}", result);
         return ResponseEntity.ok(result);
     }
 }
