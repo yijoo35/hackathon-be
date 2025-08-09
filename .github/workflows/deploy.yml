@@ -70,7 +70,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "${{ steps.artifact.outputs.path }}"
-          target: "/home/ubuntu/sunsak/build/libs/"
+          target: "/home/ubuntu/sunsak/build/libs/app.jar" # 업로드 시 파일명 지정
           overwrite: true
 
       # 5) 업로드된 파일을 app.jar로 교체 → 재시작
@@ -87,14 +87,18 @@ jobs:
             echo ">>> After SCP"
             ls -alh
 
-            # 업로드된 파일명 (로컬 basename과 동일)
-            UP="${{ steps.artifact.outputs.file }}"
-            test -f "$UP"
+            # libs 전체(중첩 포함)에서 최신 JAR 하나 선택 (app.jar/ *-plain.jar 제외)
+            CAND=$(find . -type f -name "*.jar" ! -name "app.jar" ! -name "*-plain.jar" -printf "%T@ %p\n" \
+              | sort -nr | head -n1 | awk '{print $2}')
+            test -n "$CAND" || { echo "No uploaded jar found"; exit 1; }
 
-            # app.jar 교체
-            mv -f "$UP" app.jar
+            # 이미 app.jar면 스킵, 아니면 교체
+            if [ "$CAND" = "./app.jar" ] || [ "$CAND" = "app.jar" ]; then
+              echo "Selected is app.jar already. Skip replace."
+            else
+              mv -f "$CAND" ./app.jar
+            fi
 
-            # 유닛 리로드 & 재시작 & 로그 출력
             sudo systemctl daemon-reload
             sudo systemctl restart sunsak
             sudo systemctl --no-pager --full status sunsak || true
