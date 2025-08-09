@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name="food_box")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

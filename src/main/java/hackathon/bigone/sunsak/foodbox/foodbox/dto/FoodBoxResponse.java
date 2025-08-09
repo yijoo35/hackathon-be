@@ -1,5 +1,6 @@
 package hackathon.bigone.sunsak.foodbox.foodbox.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,7 @@ public class FoodBoxResponse {
     private Long foodId;
     private String name;
     private int quantity;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.M.d")
     private LocalDate expiryDate;
 }
