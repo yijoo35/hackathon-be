@@ -15,6 +15,6 @@ public class FoodBoxResponse {
     private String name;
     private int quantity;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.mm.dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd")
     private LocalDate expiryDate;
 }
