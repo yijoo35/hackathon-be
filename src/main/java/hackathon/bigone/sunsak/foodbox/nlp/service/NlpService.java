@@ -1,6 +1,6 @@
 package hackathon.bigone.sunsak.foodbox.nlp.service;
 
-import hackathon.bigone.sunsak.foodbox.ocr.OcrExtractedItem;
+import hackathon.bigone.sunsak.foodbox.ocr.dto.OcrExtractedItem;
 import jakarta.annotation.PostConstruct;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;

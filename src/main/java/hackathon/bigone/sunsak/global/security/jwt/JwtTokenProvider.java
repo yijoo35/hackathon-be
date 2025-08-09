@@ -25,7 +25,7 @@ public class JwtTokenProvider {
 
     private Key key;
 
-    private final long ACCESS_TOKEN_VALID_TIME = 1000 * 60 * 30; // 30분
+    private final long ACCESS_TOKEN_VALID_TIME = 1000 * 60 * 60 * 3; // 3시간
     private final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7; // 7일
 
     private final UserDetailsService userDetailsService;
