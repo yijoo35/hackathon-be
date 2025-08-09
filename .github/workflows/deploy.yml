@@ -26,8 +26,7 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      # Gradle 캐시 자동 관리 + wrapper 검증
-      - name: Setup Gradle
+      - name: Setup Gradle (cache & wrapper verification)
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build (skip tests)
@@ -36,7 +35,20 @@ jobs:
       - name: List build outputs
         run: ls -alh build/libs
 
-      # 원격 경로 사전 생성 (절대경로 사용)
+      # 업로드할 산출물 경로를 하나로 확정(plain 제외)
+      - name: Resolve artifact
+        id: artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          ART="$(ls -t build/libs/*.jar | grep -v -- '-plain\.jar' | head -n1)"
+          test -n "$ART"
+          echo "path=$ART" >> "$GITHUB_OUTPUT"
+          echo "file=$(basename "$ART")" >> "$GITHUB_OUTPUT"
+          echo "Selected artifact: $ART"
+          sha256sum "$ART" || true
+
+      # 원격 폴더 준비 + 이전에 잘못 생긴 중첩 디렉토리 정리
       - name: Prepare remote dir
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -46,19 +58,21 @@ jobs:
           script: |
             set -euxo pipefail
             mkdir -p /home/ubuntu/sunsak/build/libs
+            # 중첩된 잔여물 정리(있으면)
+            rm -rf /home/ubuntu/sunsak/build/libs/build || true
 
-      # JAR 업로드 (절대경로)
+      # 산출물 "하나"만 업로드 (경로 보존 X)
       - name: Copy jar to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
-          target: "/home/ubuntu/sunsak/build/libs/"
+          source: "${{ steps.artifact.outputs.path }}"
+          target: "/home/ubuntu/sunsak/build/libs/release.jar"
           overwrite: true
 
-      # 최신 JAR로 app.jar 갱신 후 systemd 재시작
+      # release.jar -> app.jar 링크 갱신 후 systemd 재시작
       - name: Symlink latest jar & restart via systemd
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -72,18 +86,12 @@ jobs:
             echo ">>> After SCP:"
             ls -alh
 
-            # 부트 실행 JAR 우선(plain 제외), 없으면 모든 JAR에서 최신 선택
-            LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" ! -name "*-plain.jar" -printf "%T@ %p\n" \
-              | sort -nr | head -n1 | awk '{print $2}')
-            if [ -z "${LATEST}" ]; then
-              LATEST=$(find . -maxdepth 1 -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" \
-                | sort -nr | head -n1 | awk '{print $2}')
-            fi
-            test -n "${LATEST}" || { echo "No JAR found"; exit 1; }
+            test -f release.jar || { echo "release.jar not found"; exit 1; }
 
-            ln -sfn "${LATEST}" app.jar
+            # app.jar를 release.jar로 고정 링크
+            ln -sfn release.jar app.jar
 
             sudo systemctl daemon-reload
             sudo systemctl restart sunsak
             sudo systemctl --no-pager --full status sunsak || true
-            journalctl -u sunsak -n 100 --no-pager || true
+            journalctl -u sunsak -n 120 --no-pager || true
