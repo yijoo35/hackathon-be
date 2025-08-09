@@ -1,6 +1,7 @@
 package hackathon.bigone.sunsak.foodbox.foodbox.service;
 
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodBoxResponse;
+import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemRequest;
 import hackathon.bigone.sunsak.foodbox.foodbox.dto.FoodItemResponse;
 import hackathon.bigone.sunsak.foodbox.foodbox.entity.FoodBox;
 import hackathon.bigone.sunsak.foodbox.foodbox.repository.FoodBoxRepository;
@@ -93,5 +94,42 @@ public class FoodBoxService {
         if (s == null || s.isBlank()) return DEFAULT_EXPIRY_DAYS;
         try { return Integer.parseInt(s.trim()); }
         catch (NumberFormatException e) { return DEFAULT_EXPIRY_DAYS; }
+    }
+
+    //로그인한 유저의 foodbox 보여주기
+    public List<FoodBoxResponse> getFoodsByUser(Long userId) {
+        if (userId == null) throw new IllegalArgumentException("userId가 없습니다.");
+
+        return foodBoxRepository.findAllSortedByUserId(userId).stream()
+                .map(f -> FoodBoxResponse.builder()
+                        .foodId(f.getId())
+                        .name(f.getName())
+                        .quantity(f.getQuantity())
+                        .expiryDate(f.getExpiryDate())
+                        .build())
+                .toList();
+    }
+
+    @Transactional
+    public List<FoodBoxResponse> saveFoods(Long userId, List<FoodItemRequest> items) {
+        if (userId == null) throw new IllegalArgumentException("userId가 없습니다.");
+        if (items == null || items.isEmpty()) return getFoodsByUser(userId);
+
+        for (FoodItemRequest it : items) {
+            // 컨트롤러에서 이미 검증했지만 이중 방어
+            if (it == null || it.getName() == null || it.getName().isBlank())
+                continue;
+            if (it.getExpiryDate() == null)
+                throw new IllegalArgumentException("유통기한 기간을 입력해주세요.");
+
+            foodBoxRepository.save(FoodBox.builder()
+                    .userId(userId)
+                    .name(it.getName().trim())
+                    .quantity(Math.max(1, it.getQuantity()))
+                    .expiryDate(it.getExpiryDate())
+                    .build());
+        }
+
+        return getFoodsByUser(userId);
     }
 }
