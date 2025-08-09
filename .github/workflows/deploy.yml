@@ -25,7 +25,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
 
           # 긴 빌드 시간 대비
-          command_timeout: 300
+          command_timeout: 15m
 
           # 환경변수 전달 (더 안전하고 깔끔)
           envs: |
