@@ -83,7 +83,7 @@ public class FoodBoxController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteFoods(
-            @PathVariable List<Long> foodIds, //근데 id 여러개 삭제도 가능하게 할건데 List<Long> foodId 해야하나
+            @RequestBody List<Long> foodIds, //근데 id 여러개 삭제도 가능하게 할건데 List<Long> foodId 해야하나
             @AuthenticationPrincipal CustomUserDetail userDetail
     ){
         if (userDetail == null || userDetail.getUser() == null) {
